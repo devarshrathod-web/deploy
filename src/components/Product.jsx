@@ -20,7 +20,7 @@ function Product() {
   function fetchdata() {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/product?_limit=${limit}&_page=${page}`)
+      .get(`https://deploy-1-3xpw.onrender.com`)
       .then((res) => {
         setValue(res.data);
 

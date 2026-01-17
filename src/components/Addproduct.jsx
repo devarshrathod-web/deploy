@@ -9,7 +9,7 @@ function AddProduct() {
     const [updateID, setUpdateID] = useState(null);
 
     function fetchdata() {
-        axios.get('http://localhost:3000/product')
+        axios.get('https://deploy-1-3xpw.onrender.com')
             .then((res) => setValue(res.data))
             .catch((err) => console.log(err));
     }
