@@ -18,6 +18,7 @@ function AddProduct() {
     image: "",
     price: "",
     title: "",
+    description: "",
   });
 
   /* ================================
@@ -42,14 +43,19 @@ function AddProduct() {
     API.post("/product", formData)
       .then(() => {
         alert("Product added successfully!");
-        setFormData({ image: "", price: "", title: "" });
+        setFormData({
+          image: "",
+          price: "",
+          title: "",
+          description: "",
+        });
         fetchData();
       })
       .catch((err) => console.log("Add Error:", err));
   };
 
   /* ================================
-     EDIT PRODUCT
+     EDIT PRODUCT PRICE
   ================================ */
   const handleEdit = (id, oldPrice) => {
     setUpdateID(id);
@@ -116,13 +122,25 @@ function AddProduct() {
               />
             </Form.Group>
 
-            <Form.Group className="mb-4">
+            <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
                 name="title"
                 placeholder="Enter title"
                 value={formData.title}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                type="text"
+                name="description"
+                placeholder="Enter description"
+                value={formData.description}
                 onChange={handleChange}
                 required
               />
@@ -173,7 +191,10 @@ function AddProduct() {
                   style={{ height: "200px", overflow: "hidden" }}
                 >
                   <Card.Img
-                    src={item.image}
+                    src={item.image || "https://via.placeholder.com/300"}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/300";
+                    }}
                     style={{
                       width: "auto",
                       height: "100%",
@@ -189,6 +210,12 @@ function AddProduct() {
 
                   <Card.Text className="fw-bold text-muted">
                     ₹{item.price}
+                  </Card.Text>
+
+                  <Card.Text className="flex-grow-1 text-muted">
+                    {item.description
+                      ? item.description.substring(0, 70) + "..."
+                      : "No description available"}
                   </Card.Text>
 
                   <div className="mt-auto d-flex gap-2">

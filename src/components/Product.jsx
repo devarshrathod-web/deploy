@@ -10,35 +10,33 @@ import {
 } from "react-bootstrap";
 
 function Product() {
-  const [value, setValue] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
-  const limit = 5;
+  const limit = 6;
 
-  function fetchdata() {
+  const fetchData = () => {
     setLoading(true);
     axios
-      .get(`https://deploy-1-3xpw.onrender.com`)
+      .get("https://deploy-1-3xpw.onrender.com/product")
       .then((res) => {
-        setValue(res.data);
-
-        
-        const totalCount = res.headers["x-total-count"];
-        setTotalPages(Math.ceil(totalCount / limit));
-
+        setProducts(res.data);
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
       });
-  }
+  };
 
   useEffect(() => {
-    fetchdata();
-  }, [page]);
+    fetchData();
+  }, []);
+
+  const totalPages = Math.ceil(products.length / limit);
+  const start = (page - 1) * limit;
+  const currentData = products.slice(start, start + limit);
 
   return (
     <Container className="py-4">
@@ -50,21 +48,18 @@ function Product() {
         </div>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
-          {value.map((el) => (
+          {currentData.map((el) => (
             <Col key={el.id}>
-              <Card className="h-100 shadow-sm border-0 rounded-4 hover-card">
+              <Card className="h-100 shadow-sm border-0 rounded-4">
                 <div
                   className="d-flex justify-content-center align-items-center bg-light"
-                  style={{
-                    height: "220px",
-                    overflow: "hidden",
-                    borderTopLeftRadius: "1rem",
-                    borderTopRightRadius: "1rem",
-                  }}
+                  style={{ height: "220px", overflow: "hidden" }}
                 >
                   <Card.Img
-                    variant="top"
-                    src={el.image}
+                    src={el.image || "https://via.placeholder.com/300"}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/300";
+                    }}
                     style={{
                       width: "auto",
                       height: "100%",
@@ -72,29 +67,27 @@ function Product() {
                     }}
                   />
                 </div>
+
                 <Card.Body className="d-flex flex-column">
                   <Card.Title className="text-truncate fw-semibold">
                     {el.title}
                   </Card.Title>
+
                   <Card.Text className="mb-2 text-primary fw-bold">
-                    ${el.price}
+                    ₹{el.price}
                   </Card.Text>
+
                   <Card.Text className="flex-grow-1 text-muted">
-                    {el.description}
+                    {el.description
+                      ? el.description.substring(0, 80) + "..."
+                      : "No description available"}
                   </Card.Text>
+
                   <div className="mt-auto d-flex gap-2">
-                    <Button
-                      variant="outline-success"
-                      size="sm"
-                      className="w-100"
-                    >
+                    <Button variant="outline-success" size="sm" className="w-100">
                       View Details
                     </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      className="w-100"
-                    >
+                    <Button variant="outline-danger" size="sm" className="w-100">
                       Add to Cart
                     </Button>
                   </div>
@@ -105,6 +98,7 @@ function Product() {
         </Row>
       )}
 
+      {/* ================= PAGINATION ================= */}
       <div className="d-flex justify-content-between mt-4">
         <Button
           variant="secondary"
@@ -113,9 +107,11 @@ function Product() {
         >
           ⬅ Prev
         </Button>
+
         <span className="align-self-center">
           Page {page} of {totalPages}
         </span>
+
         <Button
           variant="secondary"
           disabled={page === totalPages}
